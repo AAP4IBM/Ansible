@@ -1,11 +1,27 @@
 ---
-# This playbook prints a simple debug message
-- name: Echo 
-  hosts: all
-  #connection: local
-
+- hosts: all
+  vars:
+      ansible_python_interpreter: /usr/lpp/IBM/izoda/anaconda/bin/python3
+      tgt_tmp_dir: "/tmp"
+      ctl_tmp_dir: "/tmp"
+  gather_facts: no
+  environment:
+    ZOAU_HOME: /usr/lpp/IBM/zoautil
+    PATH: /usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/izoda/anaconda/bin:/bin
+    LIBPATH: /usr/lpp/IBM/zoautil/lib:/usr/lpp/IBM/izoda/anaconda/lib:/lib:/usr/lib:.
+    PYTHONPATH: /usr/lpp/IBM/zoautil/lib
+    _BPXK_AUTOCVT: "ON"
+  collections:
+    - ibm.ibm_zos_core
   tasks:
-  - name: Print debug message
-    debug:
-      msg: Hello, Meher!
+     - name: Execute Build on a remote server
+       command: sh /u/RGOPALK/runbuild.sh
+       register: command_result
+     - name: Command Result Output
+       debug:
+         msg: "{{command_result}}"
+     - name: Check for Build state
+       fail:
+          msg: Build Failed
+       when: "'** Build State : ERROR' in command_result.stdout"
 
