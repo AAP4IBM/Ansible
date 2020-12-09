@@ -1,0 +1,10 @@
+---
+    - hosts: all
+      gather_facts: yes
+      tasks:
+         - name: Execute Build on a remote server
+           command: sh /home/dsadm/test.sh
+           register: command_result
+         - name: Command Result Output
+           debug:
+             msg: "{{command_result}}"
